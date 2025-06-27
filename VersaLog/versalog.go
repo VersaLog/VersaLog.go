@@ -29,6 +29,11 @@ const RESET = "\033[0m"
 
 func NewVersaLog(mode string, showFile bool) *VersaLog {
 	mode = strings.ToLower(mode)
+
+	if mode == "file" {
+		showFile = true
+	}
+
 	return &VersaLog{
 		mode:     mode,
 		showFile: showFile,
