@@ -2,7 +2,7 @@
 
 ![logo](/image/logo.png)
 
-## What is VersaLog?
+## What is VersaLog.go?
 
 VersaLog is a library that enables highly functional and flexible logging.
 
@@ -11,7 +11,7 @@ VersaLog is a library that enables highly functional and flexible logging.
 ## Installation
 
 ```
-pip install git+https://github.com/kayu0514/VersaLog.py.git
+go get github.com/kayu0514/VersaLog.go
 ```
 
 ## Sample
