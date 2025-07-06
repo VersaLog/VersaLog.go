@@ -6,16 +6,21 @@ import versalog "github.com/kayu0514/VersaLog.go/VersaLog"
 func main() {
 	logger := versalog.NewVersaLog("detailed", false)
 
-	logger.Info("Everything is fine.")
-	logger.Err("Something went wrong.")
-	logger.War("This is a warning.")
+	logger.Info("info")
+	logger.Error("error")
+	logger.Warning("warning.")
+	logger.Debug("debug")
+	logger.Critical("critical")
 }
 
 // showFile true
 func main() {
 	logger := versalog.NewVersaLog("detailed", true)
 
-	logger.Info("Everything is fine.")
-	logger.Err("Something went wrong.")
-	logger.War("This is a warning.")
+	logger.Info("info")
+	logger.Error("error")
+	logger.Warning("warning.")
+	logger.Debug("debug")
+	logger.Critical("critical")
+
 }
