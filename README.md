@@ -2,22 +2,18 @@
 
 ![logo](/image/logo.png)
 
-## VersaLog.go とは
+## What is VersaLog.go?
 
-多機能で柔軟なログを出力出来るライブラリです。
+VersaLog is a library that enables highly functional and flexible logging.
 
-[English](README-en.md)
-
-## インストール方法
+## Installation
 
 ```
 go get github.com/kayu0514/VersaLog.go
 ```
 
-## サンプル
+## Sample
 
-**シンプル** : [タップ](/tests/simple_test.go)
-
-**ディーテイルド** : [タップ](/tests/detailed_test.go)
-
-**ファイル** : [タップ](/tests/file_test.go)
+**Simple** : [Tap](/tests/simple_test.go)  
+**Detailed** : [Tap](/tests/detailed_test.go)
+**File** : [Tap](/tests/file_test.go)

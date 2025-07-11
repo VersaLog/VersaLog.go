@@ -23,3 +23,39 @@ func main() {
 	logger.Debug("debug")
 	logger.Critical("critical")
 }
+
+// show_tag False
+func main() {
+	logger := versalog.NewVersaLog("simple", false, false)
+
+	logger.Info("info")
+	logger.Error("error")
+	logger.Warning("warning.")
+	logger.Debug("debug")
+	logger.Critical("critical")
+
+}
+
+// show_tag true
+func main() {
+	logger := versalog.NewVersaLog("simple", false, true, "VersaLog")
+
+	logger.Info("info")
+	logger.Error("error")
+	logger.Warning("warning.")
+	logger.Debug("debug")
+	logger.Critical("critical")
+
+}
+
+// all true
+func main() {
+	logger := versalog.NewVersaLog("simple", false, false, "VersaLog", true)
+
+	logger.Info("info")
+	logger.Error("error")
+	logger.Warning("warning.")
+	logger.Debug("debug")
+	logger.Critical("critical")
+
+}

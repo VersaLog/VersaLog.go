@@ -10,7 +10,10 @@ import (
 
 type VersaLog struct {
 	mode     string
+	tag      string
 	showFile bool
+	showtag  bool
+	all      bool
 }
 
 var COLORS = map[string]string{
@@ -31,12 +34,17 @@ var SYMBOLS = map[string]string{
 
 const RESET = "\033[0m"
 
-func NewVersaLog(mode string, showFile bool) *VersaLog {
+func NewVersaLog(mode string, showFile bool, showtag bool, tag string, all bool) *VersaLog {
 	mode = strings.ToLower(mode)
 
 	validModes := map[string]bool{"simple": true, "detailed": true, "file": true}
 	if !validModes[mode] {
 		panic(fmt.Sprintf("Invalid mode '%s' specified. Valid modes are: simple, detailed, file", mode))
+	}
+
+	if all {
+		showFile = true
+		showtag = true
 	}
 
 	if mode == "file" {
@@ -46,6 +54,9 @@ func NewVersaLog(mode string, showFile bool) *VersaLog {
 	return &VersaLog{
 		mode:     mode,
 		showFile: showFile,
+		showtag:  showtag,
+		tag:      tag,
+		all:      all,
 	}
 }
 
@@ -61,11 +72,18 @@ func (v *VersaLog) getCaller() string {
 	return fmt.Sprintf("%s:%d", filepath.Base(file), line)
 }
 
-func (v *VersaLog) log(msg string, level string) {
+func (v *VersaLog) log(msg string, level string, tag ...string) {
 	level = strings.ToUpper(level)
 	color := COLORS[level]
 	symbol := SYMBOLS[level]
 	caller := ""
+	finalTag := ""
+
+	if len(tag) > 0 && tag[0] != "" {
+		finalTag = tag[0]
+	} else if v.showtag && v.tag != "" {
+		finalTag = v.tag
+	}
 
 	if v.showFile || v.mode == "file" {
 		caller = v.getCaller()
@@ -75,40 +93,51 @@ func (v *VersaLog) log(msg string, level string) {
 	switch v.mode {
 	case "simple":
 		if v.showFile {
-			output = fmt.Sprintf("[%s]%s%s%s %s", caller, color, symbol, RESET, msg)
+			if finalTag != "" {
+				output = fmt.Sprintf("[%s][%s]%s%s%s %s", caller, finalTag, color, symbol, RESET, msg)
+			} else {
+				output = fmt.Sprintf("[%s]%s%s%s %s", caller, color, symbol, RESET, msg)
+			}
 		} else {
-			output = fmt.Sprintf("%s%s%s %s", color, symbol, RESET, msg)
+			if finalTag != "" {
+				output = fmt.Sprintf("[%s]%s%s%s %s", finalTag, color, symbol, RESET, msg)
+			} else {
+				output = fmt.Sprintf("%s%s%s %s", color, symbol, RESET, msg)
+			}
 		}
 	case "file":
 		output = fmt.Sprintf("[%s]%s[%s]%s %s", caller, color, level, RESET, msg)
 	default:
 		timestamp := v.getTime()
-		if v.showFile {
-			output = fmt.Sprintf("[%s]%s[%s]%s[%s] : %s", timestamp, color, level, RESET, caller, msg)
-		} else {
-			output = fmt.Sprintf("[%s]%s[%s]%s : %s", timestamp, color, level, RESET, msg)
+		output = fmt.Sprintf("[%s]%s[%s]%s", timestamp, color, level, RESET)
+		if finalTag != "" {
+			output += fmt.Sprintf("[%s]", finalTag)
 		}
+		if v.showFile {
+			output += fmt.Sprintf("[%s]", caller)
+		}
+		output += fmt.Sprintf(" : %s", msg)
 	}
 
 	fmt.Println(output)
 }
 
-func (v *VersaLog) Info(msg string) {
-	v.log(msg, "INFO")
+func (v *VersaLog) Info(msg string, tag ...string) {
+	v.log(msg, "INFO", tag...)
 }
 
-func (v *VersaLog) Error(msg string) {
-	v.log(msg, "ERROR")
+func (v *VersaLog) Error(msg string, tag ...string) {
+	v.log(msg, "ERROR", tag...)
 }
 
-func (v *VersaLog) Warning(msg string) {
-	v.log(msg, "WARNING")
+func (v *VersaLog) Warning(msg string, tag ...string) {
+	v.log(msg, "WARNING", tag...)
 }
 
-func (v *VersaLog) Debug(msg string) {
-	v.log(msg, "DEBUG")
+func (v *VersaLog) Debug(msg string, tag ...string) {
+	v.log(msg, "DEBUG", tag...)
 }
 
-func (v *VersaLog) Critical(msg string) {
-	v.log(msg, "CRITICAL")
+func (v *VersaLog) Critical(msg string, tag ...string) {
+	v.log(msg, "CRITICAL", tag...)
 }
