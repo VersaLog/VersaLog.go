@@ -4,7 +4,7 @@ import versalog "github.com/kayu0514/VersaLog.go/VersaLog"
 
 // showFile false
 func main() {
-	logger := versalog.NewVersaLog("simple", false)
+	logger := versalog.NewVersaLog("simple", false, false, "VersaLog", false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -15,7 +15,7 @@ func main() {
 
 // showFile true
 func main() {
-	logger := versalog.NewVersaLog("simple", true)
+	logger := versalog.NewVersaLog("simple", true, false, "VersaLog", false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -26,7 +26,7 @@ func main() {
 
 // show_tag False
 func main() {
-	logger := versalog.NewVersaLog("simple", false, false)
+	logger := versalog.NewVersaLog("simple", false, false, "VersaLog", false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -38,7 +38,7 @@ func main() {
 
 // show_tag true
 func main() {
-	logger := versalog.NewVersaLog("simple", false, true, "VersaLog")
+	logger := versalog.NewVersaLog("simple", false, true, "VersaLog", false)
 
 	logger.Info("info")
 	logger.Error("error")
