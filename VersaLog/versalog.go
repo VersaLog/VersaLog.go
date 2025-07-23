@@ -6,14 +6,17 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/go-toast/toast"
 )
 
 type VersaLog struct {
-	mode     string
-	tag      string
-	showFile bool
-	showtag  bool
-	all      bool
+	mode      string
+	tag       string
+	showFile  bool
+	showtag   bool
+	Notice    bool
+	EnableAll bool
 }
 
 var COLORS = map[string]string{
@@ -34,7 +37,7 @@ var SYMBOLS = map[string]string{
 
 const RESET = "\033[0m"
 
-func NewVersaLog(mode string, showFile bool, showtag bool, tag string, all bool) *VersaLog {
+func NewVersaLog(mode string, showFile bool, showtag bool, tag string, enableAll bool, notice bool) *VersaLog {
 	mode = strings.ToLower(mode)
 
 	validModes := map[string]bool{"simple": true, "detailed": true, "file": true}
@@ -42,9 +45,10 @@ func NewVersaLog(mode string, showFile bool, showtag bool, tag string, all bool)
 		panic(fmt.Sprintf("Invalid mode '%s' specified. Valid modes are: simple, detailed, file", mode))
 	}
 
-	if all {
+	if enableAll {
 		showFile = true
 		showtag = true
+		notice = true
 	}
 
 	if mode == "file" {
@@ -52,11 +56,12 @@ func NewVersaLog(mode string, showFile bool, showtag bool, tag string, all bool)
 	}
 
 	return &VersaLog{
-		mode:     mode,
-		showFile: showFile,
-		showtag:  showtag,
-		tag:      tag,
-		all:      all,
+		mode:      mode,
+		showFile:  showFile,
+		showtag:   showtag,
+		tag:       tag,
+		Notice:    notice,
+		EnableAll: enableAll,
 	}
 }
 
@@ -120,6 +125,15 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 	}
 
 	fmt.Println(output)
+
+	if v.Notice && (level == "ERROR" || level == "CRITICAL") {
+		toastMessage := toast.Notification{
+			AppID:   "VersaLog",
+			Title:   fmt.Sprintf("%s Log notice", level),
+			Message: msg,
+		}
+		toastMessage.Push()
+	}
 }
 
 func (v *VersaLog) Info(msg string, tag ...string) {
