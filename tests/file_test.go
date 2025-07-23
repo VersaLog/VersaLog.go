@@ -3,7 +3,7 @@ package main
 import versalog "github.com/kayu0514/VersaLog.go/VersaLog"
 
 func main() {
-	logger := versalog.NewVersaLog("file", false, false, "VersaLog", false)
+	logger := versalog.NewVersaLog("file", false, false, "VersaLog", false, false)
 
 	logger.Info("info")
 	logger.Error("error")

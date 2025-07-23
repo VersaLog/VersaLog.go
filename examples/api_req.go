@@ -26,7 +26,7 @@ type WeatherResponse struct {
 }
 
 func main() {
-	logger := versalog.NewVersaLog("detailed", false, true, "Request", false)
+	logger := versalog.NewVersaLog("detailed", false, true, "Request", false, false)
 
 	api := "http://api.openweathermap.org/data/2.5/weather"
 	params := "?q=location name&appid=api key&units=metric&lang=ja"
