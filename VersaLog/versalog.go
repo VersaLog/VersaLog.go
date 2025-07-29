@@ -40,7 +40,7 @@ const RESET = "\033[0m"
 func NewVersaLog(mode string, showFile bool, showtag bool, tag string, enableAll bool, notice bool) *VersaLog {
 	mode = strings.ToLower(mode)
 
-	validModes := map[string]bool{"simple": true, "detailed": true, "file": true}
+	validModes := map[string]bool{"simple": true, "simple2": true, "detailed": true, "file": true}
 	if !validModes[mode] {
 		panic(fmt.Sprintf("Invalid mode '%s' specified. Valid modes are: simple, detailed, file", mode))
 	}
@@ -109,6 +109,17 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 			} else {
 				output = fmt.Sprintf("%s%s%s %s", color, symbol, RESET, msg)
 			}
+		}
+	case "simple2":
+		timestamp := v.getTime()
+		if v.showFile {
+			if finalTag != "" {
+				output = fmt.Sprintf("[%s] [%s][%s]%s%s%s %s", timestamp, caller, finalTag, color, symbol, RESET, msg)
+			} else {
+				output = fmt.Sprintf("[%s] [%s]%s%s%s %s", timestamp, caller, color, symbol, RESET, msg)
+			}
+		} else {
+			output = fmt.Sprintf("[%s] %s%s%s %s", timestamp, color, symbol, RESET, msg)
 		}
 	case "file":
 		output = fmt.Sprintf("[%s]%s[%s]%s %s", caller, color, level, RESET, msg)

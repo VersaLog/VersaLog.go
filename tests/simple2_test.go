@@ -4,7 +4,7 @@ import versalog "github.com/kayu0514/VersaLog.go/VersaLog"
 
 // showFile false
 func main() {
-	logger := versalog.NewVersaLog("simple", false, false, "VersaLog", false, false)
+	logger := versalog.NewVersaLog("simple2", false, false, "VersaLog", false, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -15,7 +15,7 @@ func main() {
 
 // showFile true
 func main() {
-	logger := versalog.NewVersaLog("simple", true, false, "VersaLog", false, false)
+	logger := versalog.NewVersaLog("simple2", true, false, "VersaLog", false, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -26,7 +26,7 @@ func main() {
 
 // show_tag False
 func main() {
-	logger := versalog.NewVersaLog("simple", false, false, "VersaLog", false, false)
+	logger := versalog.NewVersaLog("simple2", false, false, "VersaLog", false, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -38,7 +38,7 @@ func main() {
 
 // show_tag true
 func main() {
-	logger := versalog.NewVersaLog("simple", false, true, "VersaLog", false, false)
+	logger := versalog.NewVersaLog("simple2", false, true, "VersaLog", false, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -50,7 +50,7 @@ func main() {
 
 // notice False
 func main() {
-	logger := versalog.NewVersaLog("simple", false, false, "VersaLog", false, false)
+	logger := versalog.NewVersaLog("simple2", false, false, "VersaLog", false, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -62,7 +62,7 @@ func main() {
 
 // notice True
 func main() {
-	logger := versalog.NewVersaLog("simple", false, false, "VersaLog", false, true)
+	logger := versalog.NewVersaLog("simple2", false, false, "VersaLog", false, true)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -74,7 +74,7 @@ func main() {
 
 // enable_all true
 func main() {
-	logger := versalog.NewVersaLog("simple", false, false, "VersaLog", true, false)
+	logger := versalog.NewVersaLog("simple2", false, false, "VersaLog", true, false)
 
 	logger.Info("info")
 	logger.Error("error")
