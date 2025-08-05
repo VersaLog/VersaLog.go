@@ -104,9 +104,6 @@ func (v *VersaLog) getCaller() string {
 }
 
 func (v *VersaLog) saveLog(logText string, level string) {
-	if !v.AllSave {
-		return
-	}
 	found := false
 	for _, l := range v.SaveLevels {
 		if l == level {
@@ -117,7 +114,11 @@ func (v *VersaLog) saveLog(logText string, level string) {
 	if !found {
 		return
 	}
-	logDir := filepath.Join(filepath.Dir(filepath.Dir("./VersaLog/versalog.go")), "log")
+	cwd, err := os.Getwd()
+	if err != nil {
+		return
+	}
+	logDir := filepath.Join(cwd, "log")
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		os.MkdirAll(logDir, 0755)
 	}
