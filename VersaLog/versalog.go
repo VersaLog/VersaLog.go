@@ -2,6 +2,7 @@ package versalog
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -11,12 +12,14 @@ import (
 )
 
 type VersaLog struct {
-	mode      string
-	tag       string
-	showFile  bool
-	showtag   bool
-	Notice    bool
-	EnableAll bool
+	mode       string
+	tag        string
+	showFile   bool
+	showTag    bool
+	Notice     bool
+	EnableAll  bool
+	AllSave    bool
+	SaveLevels []string
 }
 
 var COLORS = map[string]string{
@@ -37,31 +40,54 @@ var SYMBOLS = map[string]string{
 
 const RESET = "\033[0m"
 
-func NewVersaLog(mode string, showFile bool, showtag bool, tag string, enableAll bool, notice bool) *VersaLog {
+func NewVersaLog(mode string, showFile bool, showTag bool, tag string, enableAll bool, notice bool, allSave bool, saveLevels []string) *VersaLog {
 	mode = strings.ToLower(mode)
 
 	validModes := map[string]bool{"simple": true, "simple2": true, "detailed": true, "file": true}
 	if !validModes[mode] {
-		panic(fmt.Sprintf("Invalid mode '%s' specified. Valid modes are: simple, detailed, file", mode))
+		panic(fmt.Sprintf("Invalid mode '%s' specified. Valid modes are: simple, simple2, detailed, file", mode))
 	}
 
 	if enableAll {
 		showFile = true
-		showtag = true
+		showTag = true
 		notice = true
+		allSave = true
 	}
 
 	if mode == "file" {
 		showFile = true
 	}
 
+	validSaveLevels := []string{"INFO", "ERROR", "WARNING", "DEBUG", "CRITICAL"}
+	if allSave {
+		if len(saveLevels) == 0 {
+			saveLevels = append([]string{}, validSaveLevels...)
+		} else {
+			for _, l := range saveLevels {
+				found := false
+				for _, v := range validSaveLevels {
+					if l == v {
+						found = true
+						break
+					}
+				}
+				if !found {
+					panic(fmt.Sprintf("Invalid saveLevels specified. Valid levels are: %v", validSaveLevels))
+				}
+			}
+		}
+	}
+
 	return &VersaLog{
-		mode:      mode,
-		showFile:  showFile,
-		showtag:   showtag,
-		tag:       tag,
-		Notice:    notice,
-		EnableAll: enableAll,
+		mode:       mode,
+		showFile:   showFile,
+		showTag:    showTag,
+		tag:        tag,
+		Notice:     notice,
+		EnableAll:  enableAll,
+		AllSave:    allSave,
+		SaveLevels: saveLevels,
 	}
 }
 
@@ -77,6 +103,33 @@ func (v *VersaLog) getCaller() string {
 	return fmt.Sprintf("%s:%d", filepath.Base(file), line)
 }
 
+func (v *VersaLog) saveLog(logText string, level string) {
+	if !v.AllSave {
+		return
+	}
+	found := false
+	for _, l := range v.SaveLevels {
+		if l == level {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return
+	}
+	logDir := filepath.Join(filepath.Dir(filepath.Dir("./VersaLog/versalog.go")), "log")
+	if _, err := os.Stat(logDir); os.IsNotExist(err) {
+		os.MkdirAll(logDir, 0755)
+	}
+	logFile := filepath.Join(logDir, time.Now().Format("2006-01-02")+".log")
+	f, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	f.WriteString(logText + "\n")
+}
+
 func (v *VersaLog) log(msg string, level string, tag ...string) {
 	level = strings.ToUpper(level)
 	color := COLORS[level]
@@ -86,7 +139,7 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 
 	if len(tag) > 0 && tag[0] != "" {
 		finalTag = tag[0]
-	} else if v.showtag && v.tag != "" {
+	} else if v.showTag && v.tag != "" {
 		finalTag = v.tag
 	}
 
@@ -94,20 +147,24 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 		caller = v.getCaller()
 	}
 
-	var output string
+	var output, plain string
 	switch v.mode {
 	case "simple":
 		if v.showFile {
 			if finalTag != "" {
 				output = fmt.Sprintf("[%s][%s]%s%s%s %s", caller, finalTag, color, symbol, RESET, msg)
+				plain = fmt.Sprintf("[%s][%s]%s %s", caller, finalTag, symbol, msg)
 			} else {
 				output = fmt.Sprintf("[%s]%s%s%s %s", caller, color, symbol, RESET, msg)
+				plain = fmt.Sprintf("[%s]%s %s", caller, symbol, msg)
 			}
 		} else {
 			if finalTag != "" {
 				output = fmt.Sprintf("[%s]%s%s%s %s", finalTag, color, symbol, RESET, msg)
+				plain = fmt.Sprintf("[%s]%s %s", finalTag, symbol, msg)
 			} else {
 				output = fmt.Sprintf("%s%s%s %s", color, symbol, RESET, msg)
+				plain = fmt.Sprintf("%s %s", symbol, msg)
 			}
 		}
 	case "simple2":
@@ -115,27 +172,36 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 		if v.showFile {
 			if finalTag != "" {
 				output = fmt.Sprintf("[%s] [%s][%s]%s%s%s %s", timestamp, caller, finalTag, color, symbol, RESET, msg)
+				plain = fmt.Sprintf("[%s] [%s][%s]%s %s", timestamp, caller, finalTag, symbol, msg)
 			} else {
 				output = fmt.Sprintf("[%s] [%s]%s%s%s %s", timestamp, caller, color, symbol, RESET, msg)
+				plain = fmt.Sprintf("[%s] [%s]%s %s", timestamp, caller, symbol, msg)
 			}
 		} else {
 			output = fmt.Sprintf("[%s] %s%s%s %s", timestamp, color, symbol, RESET, msg)
+			plain = fmt.Sprintf("[%s] %s %s", timestamp, symbol, msg)
 		}
 	case "file":
 		output = fmt.Sprintf("[%s]%s[%s]%s %s", caller, color, level, RESET, msg)
+		plain = fmt.Sprintf("[%s][%s] %s", caller, level, msg)
 	default:
 		timestamp := v.getTime()
 		output = fmt.Sprintf("[%s]%s[%s]%s", timestamp, color, level, RESET)
+		plain = fmt.Sprintf("[%s][%s]", timestamp, level)
 		if finalTag != "" {
 			output += fmt.Sprintf("[%s]", finalTag)
+			plain += fmt.Sprintf("[%s]", finalTag)
 		}
 		if v.showFile {
 			output += fmt.Sprintf("[%s]", caller)
+			plain += fmt.Sprintf("[%s]", caller)
 		}
 		output += fmt.Sprintf(" : %s", msg)
+		plain += fmt.Sprintf(" : %s", msg)
 	}
 
 	fmt.Println(output)
+	v.saveLog(plain, level)
 
 	if v.Notice && (level == "ERROR" || level == "CRITICAL") {
 		toastMessage := toast.Notification{
