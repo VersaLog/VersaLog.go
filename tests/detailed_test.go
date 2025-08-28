@@ -4,7 +4,7 @@ import versalog "github.com/kayu0514/VersaLog.go/VersaLog"
 
 // showFile false
 func main() {
-	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", false, false)
+	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", false, false, false, []string{}, false, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -15,7 +15,7 @@ func main() {
 
 // showFile true
 func main() {
-	logger := versalog.NewVersaLog("detailed", true, false, "VersaLog", false, false)
+	logger := versalog.NewVersaLog("detailed", true, false, "VersaLog", false, false, false, []string{}, false, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -27,7 +27,7 @@ func main() {
 
 // show_tag False
 func main() {
-	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", false, false)
+	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", false, false, false, []string{}, false, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -39,7 +39,7 @@ func main() {
 
 // show_tag true
 func main() {
-	logger := versalog.NewVersaLog("detailed", false, true, "VersaLog", false, false)
+	logger := versalog.NewVersaLog("detailed", false, true, "VersaLog", false, false, false, []string{}, false, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -51,7 +51,7 @@ func main() {
 
 // notice False
 func main() {
-	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", false, false)
+	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", false, false, false, []string{}, false, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -63,7 +63,31 @@ func main() {
 
 // notice True
 func main() {
-	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", false, true)
+	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", false, true, false, []string{}, false, false)
+
+	logger.Info("info")
+	logger.Error("error")
+	logger.Warning("warning.")
+	logger.Debug("debug")
+	logger.Critical("critical")
+
+}
+
+// silent False
+func main() {
+	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", false, true, false, []string{}, false, false)
+
+	logger.Info("info")
+	logger.Error("error")
+	logger.Warning("warning.")
+	logger.Debug("debug")
+	logger.Critical("critical")
+
+}
+
+// silent True
+func main() {
+	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", false, true, false, []string{}, true, false)
 
 	logger.Info("info")
 	logger.Error("error")
@@ -75,7 +99,7 @@ func main() {
 
 // enable_all true
 func main() {
-	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", true, false)
+	logger := versalog.NewVersaLog("detailed", false, false, "VersaLog", true, false, false, []string{}, false, false)
 
 	logger.Info("info")
 	logger.Error("error")

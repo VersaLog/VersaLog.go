@@ -11,15 +11,23 @@ import (
 	"github.com/go-toast/toast"
 )
 
+type logEntry struct {
+	text  string
+	level string
+}
+
 type VersaLog struct {
-	mode       string
-	tag        string
-	showFile   bool
-	showTag    bool
-	Notice     bool
-	EnableAll  bool
-	AllSave    bool
-	SaveLevels []string
+	mode            string
+	tag             string
+	showFile        bool
+	showTag         bool
+	Notice          bool
+	EnableAll       bool
+	AllSave         bool
+	SaveLevels      []string
+	Silent          bool
+	logChan         chan logEntry
+	catchExceptions bool
 }
 
 var COLORS = map[string]string{
@@ -40,7 +48,7 @@ var SYMBOLS = map[string]string{
 
 const RESET = "\033[0m"
 
-func NewVersaLog(mode string, showFile bool, showTag bool, tag string, enableAll bool, notice bool, allSave bool, saveLevels []string) *VersaLog {
+func NewVersaLog(mode string, showFile bool, showTag bool, tag string, enableAll bool, notice bool, allSave bool, saveLevels []string, silent bool, catchExceptions bool) *VersaLog {
 	mode = strings.ToLower(mode)
 
 	validModes := map[string]bool{"simple": true, "simple2": true, "detailed": true, "file": true}
@@ -79,15 +87,33 @@ func NewVersaLog(mode string, showFile bool, showTag bool, tag string, enableAll
 		}
 	}
 
-	return &VersaLog{
-		mode:       mode,
-		showFile:   showFile,
-		showTag:    showTag,
-		tag:        tag,
-		Notice:     notice,
-		EnableAll:  enableAll,
-		AllSave:    allSave,
-		SaveLevels: saveLevels,
+	v := &VersaLog{
+		mode:            mode,
+		showFile:        showFile,
+		showTag:         showTag,
+		tag:             tag,
+		Notice:          notice,
+		EnableAll:       enableAll,
+		AllSave:         allSave,
+		SaveLevels:      saveLevels,
+		Silent:          silent,
+		catchExceptions: catchExceptions,
+	}
+	v.logChan = make(chan logEntry, 100)
+	go v.logWorker()
+	return v
+}
+
+func (v *VersaLog) logWorker() {
+	for entry := range v.logChan {
+		v.saveLog(entry.text, entry.level)
+	}
+}
+
+// panicキャッチ用
+func (v *VersaLog) CatchPanic() {
+	if r := recover(); r != nil {
+		v.Critical(fmt.Sprintf("Unhandled panic: %v", r))
 	}
 }
 
@@ -104,6 +130,9 @@ func (v *VersaLog) getCaller() string {
 }
 
 func (v *VersaLog) saveLog(logText string, level string) {
+	if !v.AllSave {
+		return
+	}
 	found := false
 	for _, l := range v.SaveLevels {
 		if l == level {
@@ -201,8 +230,13 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 		plain += fmt.Sprintf(" : %s", msg)
 	}
 
-	fmt.Println(output)
-	v.saveLog(plain, level)
+	if !v.Silent {
+		fmt.Println(output)
+	}
+
+	if v.AllSave {
+		v.logChan <- logEntry{text: plain, level: level}
+	}
 
 	if v.Notice && (level == "ERROR" || level == "CRITICAL") {
 		toastMessage := toast.Notification{
