@@ -28,6 +28,7 @@ type VersaLog struct {
 	Silent          bool
 	logChan         chan logEntry
 	catchExceptions bool
+	lastCleanupDate string
 }
 
 var COLORS = map[string]string{
@@ -158,6 +159,41 @@ func (v *VersaLog) saveLog(logText string, level string) {
 	}
 	defer f.Close()
 	f.WriteString(logText + "\n")
+
+	today := time.Now().Format("2006-01-02")
+	if v.lastCleanupDate != today {
+		v.cleanupOldLogs(7)
+		v.lastCleanupDate = today
+	}
+}
+
+func (v *VersaLog) cleanupOldLogs(days int) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return
+	}
+	logDir := filepath.Join(cwd, "log")
+	files, err := os.ReadDir(logDir)
+	if err != nil {
+		return
+	}
+	now := time.Now()
+	for _, file := range files {
+		if !strings.HasSuffix(file.Name(), ".log") {
+			continue
+		}
+		dateStr := strings.TrimSuffix(file.Name(), ".log")
+		fileDate, err := time.Parse("2006-01-02", dateStr)
+		if err != nil {
+			continue
+		}
+		if now.Sub(fileDate).Hours() >= float64(days*24) {
+			os.Remove(filepath.Join(logDir, file.Name()))
+			if !v.Silent {
+				v.Info(fmt.Sprintf("[LOG CLEANUP] removed: %s", file.Name()))
+			}
+		}
+	}
 }
 
 func (v *VersaLog) log(msg string, level string, tag ...string) {
