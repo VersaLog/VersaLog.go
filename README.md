@@ -2,6 +2,10 @@
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+[![Go Version](https://img.shields.io/badge/go-%3E%3D1.19-blue.svg)](https://golang.org/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kayu0514/VersaLog.go)](https://goreportcard.com/report/github.com/kayu0514/VersaLog.go)
+[![Go Reference](https://pkg.go.dev/badge/github.com/kayu0514/VersaLog.go.svg)](https://pkg.go.dev/github.com/kayu0514/VersaLog.go)
+[![Downloads](https://img.shields.io/github/downloads/kayu0514/VersaLog.go/total.svg)](https://github.com/kayu0514/VersaLog.go/releases)
 
 What is VersaLog.go?
 VersaLog is a powerful and flexible logging library for Golang.
@@ -41,12 +45,6 @@ go get github.com/kayu0514/VersaLog.go
 ```
 [2025-08-06 04:10:36][INFO] : ok
 ```
-
-## Sample
-
-**Simple** : [Tap](/tests/simple_test.go)  
-**Detailed** : [Tap](/tests/detailed_test.go)
-**File** : [Tap](/tests/file_test.go)
 
 ## Contributors ✨
 
