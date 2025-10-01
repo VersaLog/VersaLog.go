@@ -17,7 +17,7 @@ type logEntry struct {
 }
 
 type VersaLog struct {
-	mode            string
+	enum            string
 	tag             string
 	showFile        bool
 	showTag         bool
@@ -49,12 +49,12 @@ var SYMBOLS = map[string]string{
 
 const RESET = "\033[0m"
 
-func NewVersaLog(mode string, showFile bool, showTag bool, tag string, enableAll bool, notice bool, allSave bool, saveLevels []string, silent bool, catchExceptions bool) *VersaLog {
-	mode = strings.ToLower(mode)
+func NewVersaLog(enum string, showFile bool, showTag bool, tag string, enableAll bool, notice bool, allSave bool, saveLevels []string, silent bool, catchExceptions bool) *VersaLog {
+	enum = strings.ToLower(enum)
 
 	validModes := map[string]bool{"simple": true, "simple2": true, "detailed": true, "file": true}
-	if !validModes[mode] {
-		panic(fmt.Sprintf("Invalid mode '%s' specified. Valid modes are: simple, simple2, detailed, file", mode))
+	if !validModes[enum] {
+		panic(fmt.Sprintf("Invalid mode '%s' specified. Valid modes are: simple, simple2, detailed, file", enum))
 	}
 
 	if enableAll {
@@ -64,7 +64,7 @@ func NewVersaLog(mode string, showFile bool, showTag bool, tag string, enableAll
 		allSave = true
 	}
 
-	if mode == "file" {
+	if enum == "file" {
 		showFile = true
 	}
 
@@ -89,7 +89,7 @@ func NewVersaLog(mode string, showFile bool, showTag bool, tag string, enableAll
 	}
 
 	v := &VersaLog{
-		mode:            mode,
+		enum:            enum,
 		showFile:        showFile,
 		showTag:         showTag,
 		tag:             tag,
@@ -209,12 +209,12 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 		finalTag = v.tag
 	}
 
-	if v.showFile || v.mode == "file" {
+	if v.showFile || v.enum == "file" {
 		caller = v.getCaller()
 	}
 
 	var output, plain string
-	switch v.mode {
+	switch v.enum {
 	case "simple":
 		if v.showFile {
 			if finalTag != "" {
