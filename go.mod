@@ -1,4 +1,4 @@
-module github.com/kayu0514/VersaLog.go
+module github.com/VersaLog/VersaLog.go
 
 go 1.23.1
 

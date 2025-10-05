@@ -1,6 +1,6 @@
 package main
 
-import versalog "github.com/kayu0514/VersaLog.go/VersaLog"
+import versalog "github.com/VersaLog/VersaLog.go/VersaLog"
 
 // showFile false
 func main() {
