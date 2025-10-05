@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	versalog "github.com/kayu0514/VersaLog.go/VersaLog"
+	versalog "github.com/VersaLog/VersaLog.go/VersaLog"
 )
 
 type WeatherResponse struct {

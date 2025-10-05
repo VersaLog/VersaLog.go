@@ -7,9 +7,9 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.19-blue.svg)](https://golang.org/)
-[![Go Report Card](https://goreportcard.com/badge/github.com/kayu0514/VersaLog.go)](https://goreportcard.com/report/github.com/kayu0514/VersaLog.go)
-[![Go Reference](https://pkg.go.dev/badge/github.com/kayu0514/VersaLog.go.svg)](https://pkg.go.dev/github.com/kayu0514/VersaLog.go)
-[![Downloads](https://img.shields.io/github/downloads/kayu0514/VersaLog.go/total.svg)](https://github.com/kayu0514/VersaLog.go/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kayu0514/VersaLog.go)](https://goreportcard.com/report/github.com/VersaLog/VersaLog.go)
+[![Go Reference](https://pkg.go.dev/badge/github.com/kayu0514/VersaLog.go.svg)](https://pkg.go.dev/github.com/VersaLog/VersaLog.go)
+[![Downloads](https://img.shields.io/github/downloads/kayu0514/VersaLog.go/total.svg)](github.com/VersaLog/VersaLog.go/releases)
 
 What is VersaLog.go?
 VersaLog is a powerful and flexible logging library for Golang.
@@ -18,7 +18,7 @@ It supports everything from simple usage to advanced, highly customizable config
 ## Installation
 
 ```
-go get github.com/kayu0514/VersaLog.go
+go get github.com/VersaLog/VersaLog.go
 ```
 
 ### Enum
