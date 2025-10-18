@@ -6,89 +6,88 @@ on:
   issues:
     types: [opened, closed, reopened, assigned, labeled, unlabeled]
 
+permissions:
+  contents: read
+
 jobs:
   send_notification:
     runs-on: ubuntu-latest
     steps:
       - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          EVENT: ${{ github.event.action }}
+          EVENT_NAME: ${{ github.event_name }}
+          USER: ${{ github.actor }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ASSIGNEE: ${{ github.event.assignee.login }}
+          LABEL: ${{ github.event.label.name }}
         run: |
-          EVENT="${{ github.event.action }}"
-          USER="${{ github.actor }}"
-          EVENT_NAME="${{ github.event_name }}"
-
+          set -e
           MESSAGE=""
 
           if [ "$EVENT_NAME" = "pull_request" ]; then
-            PR_NUMBER="${{ github.event.pull_request.number }}"
-            PR_TITLE="${{ github.event.pull_request.title }}"
-            PR_URL="${{ github.event.pull_request.html_url }}"
-            MERGED="${{ github.event.pull_request.merged }}"
-
             case "$EVENT" in
               opened)
-                MESSAGE="📢 **Pull Request #${PR_NUMBER}** が作成されました！\n👤 作者: $USER\n📝 タイトル: $PR_TITLE\n🔗 URL: $PR_URL"
+                MESSAGE="📢 Pull Request #${PR_NUMBER} created by ${USER}\n**${PR_TITLE}**\n${PR_URL}"
                 ;;
               closed)
-                if [ "$MERGED" = "true" ]; then
-                  MESSAGE="🎉 **Pull Request #${PR_NUMBER}** がマージされました！\n👤 ユーザー: $USER\n📝 タイトル: $PR_TITLE\n🔗 URL: $PR_URL"
+                if [ "$PR_MERGED" = "true" ]; then
+                  MESSAGE="🎉 Pull Request #${PR_NUMBER} merged by ${USER}\n**${PR_TITLE}**\n${PR_URL}"
                 else
-                  MESSAGE="❌ **Pull Request #${PR_NUMBER}** がクローズされました！\n👤 ユーザー: $USER\n📝 タイトル: $PR_TITLE\n🔗 URL: $PR_URL"
+                  MESSAGE="❌ Pull Request #${PR_NUMBER} closed by ${USER}\n**${PR_TITLE}**\n${PR_URL}"
                 fi
                 ;;
               reopened)
-                MESSAGE="🔄 **Pull Request #${PR_NUMBER}** が再オープンされました！\n👤 ユーザー: $USER\n📝 タイトル: $PR_TITLE\n🔗 URL: $PR_URL"
+                MESSAGE="🔄 Pull Request #${PR_NUMBER} reopened by ${USER}\n**${PR_TITLE}**\n${PR_URL}"
                 ;;
               assigned)
-                MESSAGE="🙋 **Pull Request #${PR_NUMBER}** が $USER にアサインされました！\n📝 タイトル: $PR_TITLE\n🔗 URL: $PR_URL"
+                MESSAGE="🙋 Pull Request #${PR_NUMBER} assigned to ${ASSIGNEE} by ${USER}\n**${PR_TITLE}**\n${PR_URL}"
                 ;;
               review_requested)
-                REVIEWER="${{ github.event.requested_reviewers[0].login }}"
-                MESSAGE="👀 **Pull Request #${PR_NUMBER}** のレビューが $REVIEWER にリクエストされました！\n👤 リクエスター: $USER\n📝 タイトル: $PR_TITLE\n🔗 URL: $PR_URL"
+                MESSAGE="👀 Review requested for PR #${PR_NUMBER} by ${USER}\n**${PR_TITLE}**\n${PR_URL}"
                 ;;
               *)
-                MESSAGE="⚠️ 未対応の Pull Request イベント: $EVENT"
+                MESSAGE="⚠ Unknown PR event: ${EVENT}"
                 ;;
             esac
 
           elif [ "$EVENT_NAME" = "issues" ]; then
-            ISSUE_NUMBER="${{ github.event.issue.number }}"
-            ISSUE_TITLE="${{ github.event.issue.title }}"
-            ISSUE_URL="${{ github.event.issue.html_url }}"
-
             case "$EVENT" in
               opened)
-                MESSAGE="🐛 **Issue #${ISSUE_NUMBER}** が作成されました！\n👤 作者: $USER\n📝 タイトル: $ISSUE_TITLE\n🔗 URL: $ISSUE_URL"
+                MESSAGE="🐛 Issue #${ISSUE_NUMBER} opened by ${USER}\n**${ISSUE_TITLE}**\n${ISSUE_URL}"
                 ;;
               closed)
-                MESSAGE="✅ **Issue #${ISSUE_NUMBER}** がクローズされました！\n👤 ユーザー: $USER\n📝 タイトル: $ISSUE_TITLE\n🔗 URL: $ISSUE_URL"
+                MESSAGE="✅ Issue #${ISSUE_NUMBER} closed by ${USER}\n**${ISSUE_TITLE}**\n${ISSUE_URL}"
                 ;;
               reopened)
-                MESSAGE="🔄 **Issue #${ISSUE_NUMBER}** が再オープンされました！\n👤 ユーザー: $USER\n📝 タイトル: $ISSUE_TITLE\n🔗 URL: $ISSUE_URL"
+                MESSAGE="🔄 Issue #${ISSUE_NUMBER} reopened by ${USER}\n**${ISSUE_TITLE}**\n${ISSUE_URL}"
                 ;;
               assigned)
-                ASSIGNEE="${{ github.event.assignee.login }}"
-                MESSAGE="🙋 **Issue #${ISSUE_NUMBER}** が $ASSIGNEE にアサインされました！\n👤 操作者: $USER\n📝 タイトル: $ISSUE_TITLE\n🔗 URL: $ISSUE_URL"
+                MESSAGE="🙋 Issue #${ISSUE_NUMBER} assigned to ${ASSIGNEE} by ${USER}\n**${ISSUE_TITLE}**\n${ISSUE_URL}"
                 ;;
               labeled)
-                LABEL="${{ github.event.label.name }}"
-                MESSAGE="🏷️ **Issue #${ISSUE_NUMBER}** にラベル '${LABEL}' が追加されました！\n👤 操作者: $USER\n📝 タイトル: $ISSUE_TITLE\n🔗 URL: $ISSUE_URL"
+                MESSAGE="🏷️ Label '${LABEL}' added to Issue #${ISSUE_NUMBER} by ${USER}\n**${ISSUE_TITLE}**\n${ISSUE_URL}"
                 ;;
               unlabeled)
-                LABEL="${{ github.event.label.name }}"
-                MESSAGE="🏷️ **Issue #${ISSUE_NUMBER}** からラベル '${LABEL}' が削除されました！\n👤 操作者: $USER\n📝 タイトル: $ISSUE_TITLE\n🔗 URL: $ISSUE_URL"
+                MESSAGE="🏷️ Label '${LABEL}' removed from Issue #${ISSUE_NUMBER} by ${USER}\n**${ISSUE_TITLE}**\n${ISSUE_URL}"
                 ;;
               *)
-                MESSAGE="⚠️ 未対応の Issue イベント: $EVENT"
+                MESSAGE="⚠ Unknown issue event: ${EVENT}"
                 ;;
             esac
-          else
-            MESSAGE="❓ 不明なイベントタイプ: $EVENT_NAME"
           fi
 
-          # JSONを安全に生成して送信（改行対応）
-          PAYLOAD=$(jq -n --arg content "$MESSAGE" '{content: $content}')
+          echo "Sending message to Discord..."
+          echo "$MESSAGE"
 
-          curl -s -o /dev/null -w "%{http_code}" -X POST \
+          curl -X POST \
             -H "Content-Type: application/json" \
-            -d "$PAYLOAD" \
-            "${{ secrets.DISCORD_WEBHOOK }}"
+            -d "{\"content\": \"$MESSAGE\"}" \
+            "$DISCORD_WEBHOOK"
