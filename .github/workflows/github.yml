@@ -88,6 +88,6 @@ jobs:
           echo "$MESSAGE"
 
           curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "{\"content\": \"$MESSAGE\"}" \
-            "$DISCORD_WEBHOOK"
+          -H "Content-Type: application/json" \
+          -d "{\"username\": \"GitHub\", \"avatar_url\": \"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png\", \"content\": \"$MESSAGE\"}" \
+          "$DISCORD_WEBHOOK"
