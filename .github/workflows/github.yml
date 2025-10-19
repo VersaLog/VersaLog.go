@@ -23,8 +23,6 @@ jobs:
           set -e
           echo "Sending message to Discord..."
 
-          DISCORD_WEBHOOK=$(echo "$DISCORD_WEBHOOK" | tr -d '\r\n ')
-
           if [ "$GITHUB_EVENT_NAME" = "issues" ]; then
             CONTENT="📢 Issue #$NUMBER $ACTION by $ACTOR\n**$TITLE**\n$URL"
           elif [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
