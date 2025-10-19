@@ -34,4 +34,4 @@ jobs:
           curl -H "Content-Type: application/json" \
                -X POST \
                -d "{\"content\": \"$CONTENT\"}" \
-               "$DISCORD_WEBHOOK"
+               "${{ secrets.DISCORD_WEBHOOK }}"
