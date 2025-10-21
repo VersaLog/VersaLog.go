@@ -267,7 +267,7 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 	}
 
 	if !v.Silent {
-		fmt.Printf(output)
+		fmt.Println(output)
 	}
 
 	if v.AllSave {
