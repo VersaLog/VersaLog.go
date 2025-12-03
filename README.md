@@ -50,6 +50,24 @@ go get github.com/VersaLog/VersaLog.go
 | `silent`           | True : Suppress standard output (print)                                                                                                                                         |
 | `catch_exceptions` | True : Automatically catch unhandled exceptions and log them as critical                                                                                                        |
 
+## Tag set(two tag)
+
+```
+
+logger := versalog.NewVersaLog(
+    "detailed",        // enum
+    false,             // showFile
+    true,              // showTag
+    "VersaLog,Core",   // tag(Two items separated by a comma)
+    false,             // enableAll
+    false,             // notice
+    false,             // allSave
+    []string{},        // saveLevels
+    false,             // silent
+    false,             // catchExceptions
+)
+```
+
 ## Log save
 
 ```

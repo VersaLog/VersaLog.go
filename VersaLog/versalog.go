@@ -201,12 +201,26 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 	color := COLORS[level]
 	symbol := SYMBOLS[level]
 	caller := ""
-	finalTag := ""
+	var tags []string
 
-	if len(tag) > 0 && tag[0] != "" {
-		finalTag = tag[0]
+	if len(tag) > 0 {
+		for _, t := range tag {
+			if t != "" {
+				tags = append(tags, t)
+			}
+		}
 	} else if v.showTag && v.tag != "" {
-		finalTag = v.tag
+		for _, t := range strings.Split(v.tag, ",") {
+			t = strings.TrimSpace(t)
+			if t != "" {
+				tags = append(tags, t)
+			}
+		}
+	}
+
+	tagStr := ""
+	for _, t := range tags {
+		tagStr += fmt.Sprintf("[%s]", t)
 	}
 
 	if v.showFile || v.enum == "file" {
@@ -217,17 +231,17 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 	switch v.enum {
 	case "simple":
 		if v.showFile {
-			if finalTag != "" {
-				output = fmt.Sprintf("[%s][%s]%s%s%s %s", caller, finalTag, color, symbol, RESET, msg)
-				plain = fmt.Sprintf("[%s][%s]%s %s", caller, finalTag, symbol, msg)
+			if tagStr != "" {
+				output = fmt.Sprintf("[%s]%s%s%s%s %s", caller, tagStr, color, symbol, RESET, msg)
+				plain = fmt.Sprintf("[%s]%s%s %s", caller, tagStr, symbol, msg)
 			} else {
 				output = fmt.Sprintf("[%s]%s%s%s %s", caller, color, symbol, RESET, msg)
 				plain = fmt.Sprintf("[%s]%s %s", caller, symbol, msg)
 			}
 		} else {
-			if finalTag != "" {
-				output = fmt.Sprintf("[%s]%s%s%s %s", finalTag, color, symbol, RESET, msg)
-				plain = fmt.Sprintf("[%s]%s %s", finalTag, symbol, msg)
+			if tagStr != "" {
+				output = fmt.Sprintf("%s%s%s%s %s", tagStr, color, symbol, RESET, msg)
+				plain = fmt.Sprintf("%s%s %s", tagStr, symbol, msg)
 			} else {
 				output = fmt.Sprintf("%s%s%s %s", color, symbol, RESET, msg)
 				plain = fmt.Sprintf("%s %s", symbol, msg)
@@ -236,27 +250,37 @@ func (v *VersaLog) log(msg string, level string, tag ...string) {
 	case "simple2":
 		timestamp := v.getTime()
 		if v.showFile {
-			if finalTag != "" {
-				output = fmt.Sprintf("[%s] [%s][%s]%s%s%s %s", timestamp, caller, finalTag, color, symbol, RESET, msg)
-				plain = fmt.Sprintf("[%s] [%s][%s]%s %s", timestamp, caller, finalTag, symbol, msg)
+			if tagStr != "" {
+				output = fmt.Sprintf("[%s] [%s]%s%s%s%s %s", timestamp, caller, tagStr, color, symbol, RESET, msg)
+				plain = fmt.Sprintf("[%s] [%s]%s%s %s", timestamp, caller, tagStr, symbol, msg)
 			} else {
 				output = fmt.Sprintf("[%s] [%s]%s%s%s %s", timestamp, caller, color, symbol, RESET, msg)
 				plain = fmt.Sprintf("[%s] [%s]%s %s", timestamp, caller, symbol, msg)
 			}
 		} else {
-			output = fmt.Sprintf("[%s] %s%s%s %s", timestamp, color, symbol, RESET, msg)
-			plain = fmt.Sprintf("[%s] %s %s", timestamp, symbol, msg)
+			if tagStr != "" {
+				output = fmt.Sprintf("[%s] %s%s%s%s %s", timestamp, tagStr, color, symbol, RESET, msg)
+				plain = fmt.Sprintf("[%s] %s%s %s", timestamp, tagStr, symbol, msg)
+			} else {
+				output = fmt.Sprintf("[%s] %s%s%s %s", timestamp, color, symbol, RESET, msg)
+				plain = fmt.Sprintf("[%s] %s %s", timestamp, symbol, msg)
+			}
 		}
 	case "file":
-		output = fmt.Sprintf("[%s]%s[%s]%s %s", caller, color, level, RESET, msg)
-		plain = fmt.Sprintf("[%s][%s] %s", caller, level, msg)
+		if tagStr != "" {
+			output = fmt.Sprintf("[%s]%s%s[%s]%s %s", caller, tagStr, color, level, RESET, msg)
+			plain = fmt.Sprintf("[%s]%s[%s] %s", caller, tagStr, level, msg)
+		} else {
+			output = fmt.Sprintf("[%s]%s[%s]%s %s", caller, color, level, RESET, msg)
+			plain = fmt.Sprintf("[%s][%s] %s", caller, level, msg)
+		}
 	default:
 		timestamp := v.getTime()
 		output = fmt.Sprintf("[%s]%s[%s]%s", timestamp, color, level, RESET)
 		plain = fmt.Sprintf("[%s][%s]", timestamp, level)
-		if finalTag != "" {
-			output += fmt.Sprintf("[%s]", finalTag)
-			plain += fmt.Sprintf("[%s]", finalTag)
+		if tagStr != "" {
+			output += tagStr
+			plain += tagStr
 		}
 		if v.showFile {
 			output += fmt.Sprintf("[%s]", caller)
@@ -302,4 +326,8 @@ func (v *VersaLog) Debug(msg string, tag ...string) {
 
 func (v *VersaLog) Critical(msg string, tag ...string) {
 	v.log(msg, "CRITICAL", tag...)
+}
+
+func (v *VersaLog) Board() {
+	fmt.Println(strings.Repeat("=", 45))
 }
