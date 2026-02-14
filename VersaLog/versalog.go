@@ -331,3 +331,27 @@ func (v *VersaLog) Critical(msg string, tag ...string) {
 func (v *VersaLog) Board() {
 	fmt.Println(strings.Repeat("=", 45))
 }
+
+func (v *VersaLog) Step(title string, step int, total int, tag ...string) {
+	msg := fmt.Sprintf("[STEP %d/%d] %s", step, total, title)
+	v.Info(msg, tag...)
+}
+
+func (v *VersaLog) Progress(title string, current int, total int, tag ...string) {
+	percent := 0
+	if total > 0 {
+		percent = int(float64(current) / float64(total) * 100)
+	}
+	msg := fmt.Sprintf("%s : %d%% (%d/%d)", title, percent, current, total)
+	v.Info(msg, tag...)
+}
+
+func (v *VersaLog) Timer(title string, tag ...string) func() {
+	start := time.Now()
+	v.Info(fmt.Sprintf("%s : start", title), tag...)
+
+	return func() {
+		elapsed := time.Since(start).Seconds()
+		v.Info(fmt.Sprintf("%s : done (%.2fs)", title, elapsed), tag...)
+	}
+}
